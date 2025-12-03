@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AnimeFlix V10 — Pastas com Cover + Continuar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+  :root{
+    --bg:#0b0b0b; --card:#121212; --accent:#f47521; --text:#eee; --muted:#888;
+    --glass: rgba(255,255,255,0.03);
+  }
+  [data-theme="light"]{
+    --bg:#f6f6f6; --card:#ffffff; --accent:#ff6b00; --text:#111; --muted:#555; --glass: rgba(0,0,0,0.03);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter, Lato, system-ui, -apple-system;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(180deg,var(--card),transparent);border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;color:var(--accent)}
+  .controls{display:flex;gap:10px;align-items:center}
+  .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:6px;color:var(--text);cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border:none}
+  .container{padding:18px 16px 120px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .title{font-weight:700; font-size:1.15rem}
+  .layout{display:grid;grid-template-columns: 1fr; gap:18px}
+  @media(min-width:900px){ .layout{grid-template-columns: 1fr 380px} }
+  .catalog{background:var(--card);padding:12px;border-radius:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+  .folder{cursor:pointer;border-radius:6px;overflow:hidden;background:linear-gradient(180deg, rgba(0,0,0,0.2), transparent);border:1px solid rgba(255,255,255,0.03)}
+  .poster{width:100%;height:210px;object-fit:cover;background:#111;display:block}
+  .fmeta{padding:8px}
+  .fname{font-weight:700; font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fsub{font-size:0.82rem;color:var(--muted);margin-top:6px}
+  #series-view{display:none;background:var(--card);padding:12px;border-radius:8px}
+  .back{display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:var(--muted)}
+  .season-select{width:100%;padding:8px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--text);margin:8px 0}
+  .ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .ep-card{background:linear-gradient(180deg,transparent, rgba(0,0,0,0.03));padding:10px;border-radius:6px;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+  .ep-name{font-weight:700;font-size:0.92rem}
+  .ep-actions{display:flex;gap:6px;align-items:center;justify-content:space-between;margin-top:auto;font-size:0.85rem;color:var(--muted)}
+  .continue{background:var(--card);padding:12px;border-radius:8px}
+  .cw-list{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+  .cw-card{min-width:220px;border-radius:6px;overflow:hidden;background:#000;position:relative;cursor:pointer}
+  .cw-card img{width:100%;height:120px;object-fit:cover;display:block;opacity:0.95}
+  .cw-info{position:absolute;left:0;bottom:0;right:0;padding:10px;background:linear-gradient(0deg,rgba(0,0,0,0.85),transparent)}
+  .cw-title{font-weight:700;font-size:0.9rem}
+  .prog{height:4px;background:rgba(255,255,255,0.12);width:100%}
+  .form-row{display:flex;gap:8px}
+  .input, textarea{width:100%;padding:9px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+  textarea{min-height:90px;resize:vertical}
+  .small{font-size:0.85rem;color:var(--muted)}
+  #player-overlay{position:fixed;inset:0;background:#000;display:none;z-index:2000;flex-direction:column}
+  .player-top{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--card)}
+  #video-area{flex:1;display:flex;align-items:center;justify-content:center;padding:10px}
+  video, iframe{width:100%;height:100%;border:none;border-radius:6px}
+  .muted{color:var(--muted)} .row{display:flex;gap:8px;align-items:center}
+  .hidden{display:none}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><i class="fas fa-play-circle"></i> AnimeFlix</div>
+  <div class="controls">
+    <button id="themeBtn" class="btn" title="Alternar tema"><i class="fa-regular fa-circle-half-stroke"></i></button>
+    <button class="btn" onclick="toggleAddPanel()"><i class="fa-solid fa-plus"></i> Adicionar</button>
+    <button class="btn" onclick="openSettings()"><i class="fa-solid fa-gear"></i></button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="layout">
+    <div>
+      <div class="continue" id="continue-section" style="margin-bottom:14px">
+        <div class="section-header">
+          <div class="title">Continuar assistindo</div>
+          <div class="small muted">sincronizado</div>
+        </div>
+        <div class="cw-list" id="cw-list"></div>
+      </div>
+
+      <div class="catalog" id="home-view">
+        <div class="section-header">
+          <div class="title">Meus Animes (Pastas)</div>
+          <div class="small muted">Clique para abrir</div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <input id="search-input" class="input" placeholder="Buscar anime..." oninput="renderCatalog()">
+        </div>
+
+        <div class="grid" id="anime-catalog"></div>
+      </div>
+
+      <div id="series-view">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="row">
+            <button class="btn" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div style="margin-left:12px">
+              <div id="series-title" style="font-weight:800;font-size:1.1rem"></div>
+              <div id="series-sub" class="small muted"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn" id="editSeriesBtn"><i class="fa-solid fa-pen"></i> Editar</button>
+            <button class="btn" id="deleteSeriesBtn"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <select id="season-dropdown" class="season-select" onchange="renderEpisodes()"></select>
+        </div>
+
+        <div class="ep-grid" id="ep-list"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="catalog" id="add-panel" style="display:none">
+        <div class="section-header"><div class="title">Adicionar Anime (Modo Pasta)</div></div>
+
+        <div class="small muted" style="margin-bottom:8px">Preencha os campos abaixo. Na lista de episódios use o formato: <code>Nome do Episódio | https://link.mp4</code> — uma por linha.</div>
+
+        <div style="margin-bottom:8px">
+          <label class="small">Nome do Anime</label>
+          <input id="form-anime" class="input" placeholder="Ex: Naruto Shippuden">
+        </div>
+
+        <div style="margin-bottom:8px">
+          <label class="small">Link da Capa (poster vertical)</label>
+          <input id="form-cover" class="input" placeholder="https://...jpg (opcional)">
+        </div>
+
+        <div style="margin-bottom:8px">
+          <label class="small">Nome da Temporada</label>
+          <input id="form-season" class="input" placeholder="Temporada 1">
+        </div>
+
+        <div style="margin-bottom:8px">
+          <label class="small">Lista de Episódios (Nome | Link)</label>
+          <textarea id="form-list" placeholder="Episódio 01 | https://...mp4
+Episódio 02 | https://...mp4"></textarea>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn primary" onclick="addAnimeFolder()">Criar Pasta / Adicionar Eps</button>
+          <button class="btn" onclick="clearForm()">Limpar</button>
+        </div>
+      </div>
+
+      <div class="catalog" style="margin-top:12px">
+        <div class="section-header"><div class="title">Configurações</div></div>
+        <div class="small muted" style="margin-bottom:8px">Firebase: substitua sua config no script (já inserida). Veja notas abaixo.</div>
+        <div style="display:flex;gap:8px;flex-direction:column">
+          <button class="btn" onclick="exportDump()"><i class="fa-solid fa-file-export"></i> Exportar JSON</button>
+          <button class="btn" onclick="importPrompt()"><i class="fa-solid fa-file-import"></i> Importar JSON</button>
+          <button class="btn" onclick="clearAllLocal()"><i class="fa-solid fa-trash"></i> Reset local (limpar cache)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="player-overlay">
+  <div class="player-top">
+    <div id="player-title" style="font-weight:800"></div>
+    <div>
+      <button class="btn" onclick="closePlayer()">Fechar</button>
+    </div>
+  </div>
+  <div id="video-area"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // ======= SUA CONFIG COMPLETA (com databaseURL) =======
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbK8wf20sq8gxRV1xwdS_P9Os4tjwelYU",
+    authDomain: "meu-streamer.firebaseapp.com",
+    databaseURL: "https://meu-streamer-default-rtdb.firebaseio.com/",
+    projectId: "meu-streamer",
+    storageBucket: "meu-streamer.firebasestorage.app",
+    messagingSenderId: "1023448042216",
+    appId: "1:1023448042216:web:2855d9664ac6aff651175d"
+  };
+  // ======================================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+
+  let UID = null;
+  signInAnonymously(auth).catch(console.error);
+  onAuthStateChanged(auth, user => {
+    if(user){ UID = user.uid; startRealtime(); } else { UID = null; }
+  });
+
+  function animesRef(){ return ref(db, `animes/${UID}`); }
+  function historyRef(){ return ref(db, `history/${UID}`); }
+
+  const LOCAL_KEY = 'anime_db_v10_local';
+  const catalogEl = document.getElementById('anime-catalog');
+  const cwListEl = document.getElementById('cw-list');
+  const continueSection = document.getElementById('continue-section');
+  const homeView = document.getElementById('home-view');
+  const seriesView = document.getElementById('series-view');
+  const seriesTitle = document.getElementById('series-title');
+  const seriesSub = document.getElementById('series-sub');
+  const seasonDropdown = document.getElementById('season-dropdown');
+  const epList = document.getElementById('ep-list');
+
+  let currentAnimeId = null;
+  let currentAnimeData = null;
+  let currentSeason = null;
+
+  function toggleAddPanel(){ const p = document.getElementById('add-panel'); p.style.display = (p.style.display==='none' || p.style.display==='') ? 'block' : 'none'; }
+  window.toggleAddPanel = toggleAddPanel;
+  function openSettings(){ alert('RealtimeDB e Auth anon devem estar habilitados no Firebase console.'); }
+
+  const themeBtn = document.getElementById('themeBtn');
+  function applyTheme(t){
+    if(!t) t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t==='dark' ? '' : 'light');
+    localStorage.setItem('theme', t);
+  }
+  themeBtn.onclick = () => { const current = localStorage.getItem('theme') || 'dark'; applyTheme(current === 'dark' ? 'light' : 'dark'); }
+  applyTheme(localStorage.getItem('theme') || 'dark');
+
+  function startRealtime(){
+    if(!UID) return;
+    onValue(animesRef(), snap => {
+      const val = snap.val() || {};
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(val));
+      renderCatalogFromData(val);
+      // if we are viewing an open series, refresh its data
+      if(currentAnimeId && val[currentAnimeId]) {
+        currentAnimeData = val[currentAnimeId];
+        seriesTitle.innerText = currentAnimeData.name || '';
+        renderEpisodes();
+      }
+    });
+    onValue(historyRef(), snap => {
+      const val = snap.val() || {};
+      renderHistoryFromData(val);
+    });
+  }
+
+  function renderCatalogFromData(dbData){
+    const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+    catalogEl.innerHTML = '';
+    const keys = Object.keys(dbData || {}).sort((a,b)=>{
+      const na = (dbData[a].name||'').toLowerCase();
+      const nb = (dbData[b].name||'').toLowerCase();
+      return na.localeCompare(nb);
+    });
+    if(keys.length===0){
+      catalogEl.innerHTML = `<div class="small muted">Sem animes — use "Adicionar" para criar pastas.</div>`;
+      return;
+    }
+    keys.forEach(id => {
+      const a = dbData[id];
+      if(q && !((a.name||'').toLowerCase().includes(q))) return;
+      const div = document.createElement('div');
+      div.className = 'folder';
+      div.onclick = () => openSeries(id, a);
+      const cover = a.cover || `https://via.placeholder.com/300x450/111/fff?text=${encodeURIComponent(a.name||'Anime')}`;
+      div.innerHTML = `
+        <img class="poster" src="${cover}" alt="${(a.name||'')}">
+        <div class="fmeta">
+          <div class="fname">${a.name||'Sem título'}</div>
+          <div class="fsub">${Object.keys(a.seasons||{}).length} Temporada(s)</div>
+        </div>
+      `;
+      catalogEl.appendChild(div);
+    });
+  }
+
+  function renderCatalog(){ const local = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}'); renderCatalogFromData(local); }
+  window.renderCatalog = renderCatalog;
+
+  window.openSeries = openSeries;
+  function openSeries(id, data){
+    currentAnimeId = id;
+    currentAnimeData = data;
+    homeView.style.display = 'none';
+    seriesView.style.display = 'block';
+    seriesTitle.innerText = data.name || 'Sem nome';
+    seriesSub.innerText = data.description || '';
+    seasonDropdown.innerHTML = '';
+    const seasons = Object.keys(data.seasons||{});
+    if(seasons.length===0){
+      seasonDropdown.innerHTML = `<option value="__empty">Sem temporadas</option>`;
+      renderEpisodes();
+      return;
+    }
+    seasons.forEach(s => {
+      const opt = document.createElement('option'); opt.value = s; opt.innerText = s;
+      seasonDropdown.appendChild(opt);
+    });
+    currentSeason = seasons[0];
+    renderEpisodes();
+
+    document.getElementById('deleteSeriesBtn').onclick = async () => {
+      if(!confirm('Excluir esta pasta e todos os episódios?')) return;
+      await remove(ref(db, `animes/${UID}/${currentAnimeId}`));
+      goHome();
+    };
+    document.getElementById('editSeriesBtn').onclick = () => {
+      toggleAddPanel();
+      document.getElementById('form-anime').value = data.name || '';
+      document.getElementById('form-cover').value = data.cover || '';
+    };
+  }
+
+  function goHome(){ seriesView.style.display = 'none'; homeView.style.display = 'block'; currentAnimeId = null; currentAnimeData = null; }
+  window.goHome = goHome;
+
+  function renderEpisodes(){
+    if(!currentAnimeId || !currentAnimeData) {
+      epList.innerHTML = `<div class="small muted">Selecione uma pasta</div>`;
+      return;
+    }
+    const season = seasonDropdown.value || Object.keys(currentAnimeData.seasons||{})[0];
+    currentSeason = season;
+    const episodes = (currentAnimeData.seasons && currentAnimeData.seasons[season]) || {};
+    epList.innerHTML = '';
+    const keys = Object.keys(episodes);
+    if(keys.length===0){
+      epList.innerHTML = `<div class="small muted">Sem episódios nessa temporada.</div>`;
+      return;
+    }
+    keys.forEach(epId => {
+      const ep = episodes[epId];
+      const d = document.createElement('div');
+      d.className = 'ep-card';
+      d.onclick = (e) => { if(e.target.closest('button')) return; openPlayer(ep.link, ep.name, currentAnimeData.cover); };
+      d.innerHTML = `
+        <div class="ep-name">${ep.name}</div>
+        <div class="small muted">${ep.link}</div>
+        <div class="ep-actions">
+          <div class="muted">#${epId}</div>
+          <div>
+            <button class="btn" onclick="editEpisode('${epId}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn" onclick="deleteEpisode('${epId}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `;
+      epList.appendChild(d);
+    });
+  }
+
+  function openPlayer(url, name, cover){
+    document.getElementById('player-title').innerText = name;
+    const ov = document.getElementById('player-overlay');
+    const ar = document.getElementById('video-area'); ar.innerHTML = '';
+    ov.style.display = 'flex';
+
+    if(url.includes('.mp4')){
+      ar.innerHTML = `<video controls autoplay><source src="${url}" type="video/mp4"></video>`;
+    } else if(url.includes('.m3u8')){
+      ar.innerHTML = `<video controls autoplay><source src="${url}" type="application/vnd.apple.mpegurl"></video>`;
+    } else {
+      ar.innerHTML = `<iframe src="${url}" allow="autoplay" allowfullscreen></iframe>`;
+    }
+
+    const entry = { name, link: url, cover: cover || `https://via.placeholder.com/300x450/111/fff?text=${encodeURIComponent(name)}`, ts: Date.now(), percent: Math.floor(Math.random()*70)+20 };
+    push(historyRef(), entry).catch(console.error);
+  }
+  window.openPlayer = openPlayer;
+
+  function closePlayer(){ document.getElementById('player-overlay').style.display = 'none'; document.getElementById('video-area').innerHTML = ''; }
+  window.closePlayer = closePlayer;
+
+  function renderHistoryFromData(histData){
+    const arr = Object.keys(histData || {}).map(k => ({ id:k, ...histData[k] }));
+    arr.sort((a,b) => (b.ts||0) - (a.ts||0));
+    cwListEl.innerHTML = '';
+    if(arr.length===0){ continueSection.style.display='none'; return; }
+    continueSection.style.display='block';
+    arr.forEach(item => {
+      const c = document.createElement('div');
+      c.className = 'cw-card';
+      c.onclick = () => openPlayer(item.link, item.name, item.cover);
+      c.innerHTML = `
+        <img src="${item.cover}" alt="${item.name}">
+        <div class="cw-info">
+          <div class="cw-title">${item.name}</div>
+          <div class="prog"><i style="width:${item.percent||30}%"></i></div>
+        </div>
+      `;
+      cwListEl.appendChild(c);
+    });
+  }
+
+  window.addAnimeFolder = async function(){
+    const anime = document.getElementById('form-anime').value.trim();
+    let cover = document.getElementById('form-cover').value.trim();
+    const season = document.getElementById('form-season').value.trim() || 'Temporada 1';
+    const list = document.getElementById('form-list').value.trim();
+    if(!anime || !list){ alert('Preencha Nome do Anime e Lista de Episódios'); return; }
+    if(!cover) cover = `https://via.placeholder.com/300x450/111/fff?text=${encodeURIComponent(anime)}`;
+    const eps = {};
+    list.split('\n').forEach(line => {
+      if(!line.trim()) return;
+      const parts = line.split('|');
+      if(parts.length<2) return;
+      const name = parts[0].trim();
+      const link = parts[1].trim();
+      const epId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+      eps[epId] = { name, link };
+    });
+
+    // Criar novo anime com push
+    const newRef = push(ref(db, `animes/${UID}`));
+    const animeObj = { name: anime, cover: cover, seasons: { [season]: eps }, createdAt: Date.now() };
+    try{ await set(newRef, animeObj); alert('Pasta criada com sucesso!'); clearForm(); }catch(err){ console.error(err); alert('Erro ao salvar: ' + err.message); }
+  };
+
+  window.clearForm = function(){ document.getElementById('form-anime').value=''; document.getElementById('form-cover').value=''; document.getElementById('form-season').value=''; document.getElementById('form-list').value=''; };
+
+  window.deleteEpisode = async function(epId){
+    if(!confirm('Excluir este episódio?')) return;
+    const path = `animes/${UID}/${currentAnimeId}/seasons/${currentSeason}/${epId}`;
+    await remove(ref(db, path));
+  };
+
+  window.editEpisode = function(epId){
+    const ep = (currentAnimeData.seasons && currentAnimeData.seasons[currentSeason] && currentAnimeData.seasons[currentSeason][epId]) || null;
+    if(!ep) return alert('Episódio não encontrado');
+    const raw = prompt('Editar episódio (formato: Nome | link)', `${ep.name} | ${ep.link}`);
+    if(!raw) return;
+    const parts = raw.split('|');
+    if(parts.length<2) return alert('Formato inválido');
+    const newName = parts[0].trim();
+    const newLink = parts[1].trim();
+    const updates = {};
+    updates[`animes/${UID}/${currentAnimeId}/seasons/${currentSeason}/${epId}/name`] = newName;
+    updates[`animes/${UID}/${currentAnimeId}/seasons/${currentSeason}/${epId}/link`] = newLink;
+    update(ref(db), updates).catch(console.error);
+  };
+
+  window.exportDump = function(){
+    const data = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'anime_db_export.json'; a.click(); URL.revokeObjectURL(url);
+  };
+
+  window.importPrompt = function(){
+    const raw = prompt('Cole aqui um JSON com a estrutura de animes (id -> animeObj). Isso substituirá o cache local para testes.');
+    if(!raw) return;
+    try{
+      const obj = JSON.parse(raw);
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(obj));
+      alert('Importado no cache local. Se quiser enviar ao Firebase, peça para eu subir.');
+      renderCatalogFromData(obj);
+    }catch(e){ alert('JSON inválido'); }
+  };
+
+  window.clearAllLocal = function(){ if(!confirm('Apagar cache local?')) return; localStorage.removeItem(LOCAL_KEY); alert('Cache limpo.'); renderCatalog(); };
+
+  setTimeout(()=>{ renderCatalog(); }, 300);
+</script>
+
+</body>
+</html>
