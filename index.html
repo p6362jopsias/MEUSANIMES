@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
+<html lang="pt-br"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnimeFlix V9 - Pastas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&amp;display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
@@ -80,33 +79,81 @@
         <i class="fas fa-cog config-icon" onclick="toggleModal()"></i>
     </header>
 
-    <div id="continue-section" style="display:none;">
+    <div id="continue-section" style="display: block;">
         <div class="section-header"><h2 class="section-title">Continuar assistindo</h2></div>
-        <div class="cw-scroll" id="cw-list"></div>
+        <div class="cw-scroll" id="cw-list"><div class="cw-card">
+                    <div class="cw-thumb-box">
+                        <img src="https://s3.tattoo2me.com/wp-content/uploads/2023/06/naruto-scaled.jpeg" alt="Isekai Nonbiri Nouka - EP1.mp4 download">
+                        <div class="cw-info"><div class="cw-name">Isekai Nonbiri Nouka - EP1.mp4 download</div></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:93%"></div></div>
+                    </div></div></div>
     </div>
 
-    <div id="home-view">
+    <div id="home-view" style="display: none;">
         <div class="section-header"><h2 class="section-title">Meus Animes</h2></div>
-        <div class="catalog-grid" id="anime-catalog"></div>
+        <div class="catalog-grid" id="anime-catalog"><div class="anime-folder">
+                    <img class="folder-poster" src="https://via.placeholder.com/200x300/333/fff?text=Naruto">
+                    <div class="folder-title">Exemplo Naruto</div>
+                    <div class="folder-meta">2 Temporadas</div>
+                </div><div class="anime-folder">
+                    <img class="folder-poster" src="https://s3.tattoo2me.com/wp-content/uploads/2023/06/naruto-scaled.jpeg">
+                    <div class="folder-title">TESTE2025</div>
+                    <div class="folder-meta">1 Temporadas</div>
+                </div></div>
     </div>
 
-    <div id="series-view">
+    <div id="series-view" style="display: block;">
         <div class="section-header">
             <button class="back-btn" onclick="goHome()" style="display:block;"><i class="fas fa-arrow-left"></i></button>
-            <h2 class="section-title" id="series-title">Nome do Anime</h2>
+            <h2 class="section-title" id="series-title">TESTE2025</h2>
         </div>
         
         <div class="season-selector">
-            <select id="season-dropdown" class="season-select" onchange="renderEpisodes()">
-                </select>
+            <select id="season-dropdown" class="season-select" onchange="renderEpisodes()"><option value="1">1</option></select>
         </div>
 
-        <div class="ep-grid" id="ep-list"></div>
+        <div class="ep-grid" id="ep-list"><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP1.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP 10.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP 11.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP 12.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP 2.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP 3.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - EP 4.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - 5.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - 6.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - 7.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - 8.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div><div class="ep-card">
+                    <div class="ep-name">Isekai Nonbiri Nouka - 9.mp4 download</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                </div></div>
     </div>
 
-    <div class="modal-bg" id="settings-modal">
+    <div class="modal-bg" id="settings-modal" style="display: flex;">
         <div class="modal-content">
-            <span class="close-modal" onclick="toggleModal()">&times;</span>
+            <span class="close-modal" onclick="toggleModal()">×</span>
             <h3 style="margin-top:0; color:var(--accent);">Adicionar Anime (Modo Pasta)</h3>
 
             <div class="config-section">
@@ -122,7 +169,8 @@
                 <input type="text" id="form-season" placeholder="Ex: Temporada 1">
 
                 <label>4. Lista de Episódios (Nome | Link)</label>
-                <textarea id="form-list" rows="5" placeholder="Episódio 1 | https://video.mp4&#10;Episódio 2 | https://video.mp4"></textarea>
+                <textarea id="form-list" rows="5" placeholder="Episódio 1 | https://video.mp4
+Episódio 2 | https://video.mp4"></textarea>
 
                 <button class="btn-full" onclick="addAnimeFolder()">Criar Pasta / Adicionar Eps</button>
             </div>
@@ -130,7 +178,7 @@
             <div class="config-section" style="border: 1px solid var(--accent);">
                 <label>🚀 Atualizar Site (GitHub)</label>
                 <button class="btn-full btn-primary" onclick="generateCode()">GERAR CÓDIGO COMPLETO</button>
-                <textarea id="code-output" rows="5" placeholder="O código aparecerá aqui..." style="display:none; margin-top:10px;" onclick="this.select()"></textarea>
+                <textarea id="code-output" rows="5" placeholder="O código aparecerá aqui..." style="display: block; margin-top: 10px;" onclick="this.select()"></textarea>
             </div>
             
             <div class="config-section">
@@ -139,10 +187,10 @@
         </div>
     </div>
 
-    <div id="player-overlay">
+    <div id="player-overlay" style="display: none;">
         <div class="player-top">
-            <span id="player-title" style="color:white; font-weight:bold;">Assistindo...</span>
-            <span style="color:white; font-size:1.5rem; cursor:pointer;" onclick="closePlayer()">&times;</span>
+            <span id="player-title" style="color:white; font-weight:bold;">Isekai Nonbiri Nouka - EP1.mp4 download</span>
+            <span style="color:white; font-size:1.5rem; cursor:pointer;" onclick="closePlayer()">×</span>
         </div>
         <div id="video-area"></div>
     </div>
@@ -155,19 +203,83 @@
            Nome do Anime -> { capa: "url", temporadas: { "Temp 1": [eps], "Temp 2": [eps] } } 
         */
         const db_series = {
-            "Exemplo Naruto": {
-                "cover": "https://via.placeholder.com/200x300/333/fff?text=Naruto",
-                "seasons": {
-                    "Temporada 1": [
-                        { "nome": "Episódio 01", "link": "https://www.w3schools.com/html/mov_bbb.mp4" },
-                        { "nome": "Episódio 02", "link": "https://www.w3schools.com/html/mov_bbb.mp4" }
-                    ],
-                    "Temporada 2": [
-                        { "nome": "Episódio 50", "link": "https://www.w3schools.com/html/mov_bbb.mp4" }
-                    ]
+    "Exemplo Naruto": {
+        "cover": "https://via.placeholder.com/200x300/333/fff?text=Naruto",
+        "seasons": {
+            "Temporada 1": [
+                {
+                    "nome": "Episódio 01",
+                    "link": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                {
+                    "nome": "Episódio 02",
+                    "link": "https://www.w3schools.com/html/mov_bbb.mp4"
                 }
-            }
-        };
+            ],
+            "Temporada 2": [
+                {
+                    "nome": "Episódio 50",
+                    "link": "https://www.w3schools.com/html/mov_bbb.mp4"
+                }
+            ]
+        }
+    },
+    "TESTE2025": {
+        "cover": "https://s3.tattoo2me.com/wp-content/uploads/2023/06/naruto-scaled.jpeg",
+        "seasons": {
+            "1": [
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP1.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%201.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP 10.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%2010.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP 11.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%2011.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP 12.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%2012.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP 2.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%202.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP 3.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%203.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - EP 4.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%204.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - 5.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%205.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - 6.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%206.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - 7.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%207.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - 8.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%208.mp4"
+                },
+                {
+                    "nome": "Isekai Nonbiri Nouka - 9.mp4 download",
+                    "link": "https://archive.org/download/isekai-nonbiri-nouka/Isekai%20Nonbiri%20Nouka-%209.mp4"
+                }
+            ]
+        }
+    }
+};
 
         const LOCAL_KEY = 'anime_db_v9';
         const SAVE_KEY = 'anime_history_v9';
@@ -389,5 +501,5 @@
         function clearData() { if(confirm("Apagar dados locais?")) { localStorage.removeItem(LOCAL_KEY); location.reload(); } }
 
     </script>
-</body>
-</html>
+
+</body></html>
