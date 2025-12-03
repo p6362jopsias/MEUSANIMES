@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeFlix V9 - Pastas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <style>
+        /* --- ESTILO DARK CRUNCHYROLL --- */
+        :root { --bg: #000000; --header: #23252b; --accent: #f47521; --text: #ffffff; --card: #141414; }
+        * { box-sizing: border-box; outline: none; }
+        body { margin: 0; font-family: 'Lato', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+        /* HEADER */
+        header { background: var(--header); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #333; }
+        .logo { font-size: 1.4rem; font-weight: 900; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        .config-icon { font-size: 1.4rem; color: #ccc; cursor: pointer; transition: 0.3s; }
+        .config-icon:hover { color: var(--accent); transform: rotate(90deg); }
+
+        /* TÍTULOS */
+        .section-header { margin: 25px 20px 15px 20px; display: flex; align-items: center; gap: 10px;}
+        .section-title { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; border-left: 4px solid var(--accent); padding-left: 10px;}
+        .back-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; display: none; margin-right: 10px; }
+
+        /* --- TELA INICIAL (CATÁLOGO DE ANIMES/PASTAS) --- */
+        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 0 20px; }
+        .anime-folder { cursor: pointer; position: relative; transition: transform 0.2s; }
+        .anime-folder:hover { transform: scale(1.03); z-index: 5; }
+        .folder-poster { width: 100%; height: 240px; object-fit: cover; border-radius: 4px; background: #222; }
+        .folder-title { margin-top: 8px; font-weight: bold; font-size: 1rem; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .folder-meta { font-size: 0.8rem; color: #888; }
+
+        /* --- DENTRO DA PASTA (EPISÓDIOS) --- */
+        #series-view { display: none; } /* Escondido por padrão */
+        .season-selector { padding: 0 20px; margin-bottom: 20px; }
+        .season-select { background: #1a1a1a; color: white; border: 1px solid #333; padding: 10px; font-size: 1rem; border-radius: 4px; width: 100%; max-width: 300px; font-weight: bold; }
+        
+        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 0 20px; }
+        .ep-card { cursor: pointer; background: var(--card); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; gap: 5px; transition: 0.2s; }
+        .ep-card:hover { background: #222; transform: translateY(-2px); }
+        .ep-thumb { width: 100%; height: 90px; object-fit: cover; border-radius: 3px; background: #000; }
+        .ep-name { font-size: 0.9rem; font-weight: bold; color: #eee; }
+        .ep-link-indicator { font-size: 0.7rem; color: var(--accent); }
+
+        /* --- CONTINUAR ASSISTINDO (HORIZONTAL) --- */
+        .cw-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px 20px 20px; scrollbar-width: none; }
+        .cw-card { min-width: 260px; position: relative; cursor: pointer; background: #000; transition: transform 0.2s; }
+        .cw-card:hover { transform: scale(1.03); z-index: 5; }
+        .cw-thumb-box { width: 100%; height: 146px; position: relative; overflow: hidden; border-radius: 4px; }
+        .cw-thumb-box img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+        .cw-info { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding: 30px 10px 8px 10px; }
+        .cw-name { font-size: 0.9rem; font-weight: 700; text-shadow: 1px 1px 2px black; }
+        .prog-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.2); }
+        .prog-fill { height: 100%; background: var(--accent); width: 0%; }
+
+        /* CONFIG MODAL */
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px 0; }
+        .modal-content { background: #1a1a1a; width: 90%; max-width: 600px; border-radius: 8px; padding: 20px; border-top: 4px solid var(--accent); margin-bottom: 50px; }
+        .close-modal { float: right; font-size: 1.5rem; cursor: pointer; }
+        .config-section { background: #111; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #333; }
+        
+        label { color: var(--accent); font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-family: monospace; }
+        .btn-full { width: 100%; padding: 12px; background: #333; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 5px; }
+        .btn-primary { background: var(--accent); }
+
+        #player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 3000; flex-direction: column; }
+        #video-area { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; }
+        video, iframe { width: 100%; height: 100%; border: none; }
+        .player-top { padding: 15px; background: #111; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><i class="fas fa-play-circle"></i> ANIME FLIX</div>
+        <i class="fas fa-cog config-icon" onclick="toggleModal()"></i>
+    </header>
+
+    <div id="continue-section" style="display:none;">
+        <div class="section-header"><h2 class="section-title">Continuar assistindo</h2></div>
+        <div class="cw-scroll" id="cw-list"></div>
+    </div>
+
+    <div id="home-view">
+        <div class="section-header"><h2 class="section-title">Meus Animes</h2></div>
+        <div class="catalog-grid" id="anime-catalog"></div>
+    </div>
+
+    <div id="series-view">
+        <div class="section-header">
+            <button class="back-btn" onclick="goHome()" style="display:block;"><i class="fas fa-arrow-left"></i></button>
+            <h2 class="section-title" id="series-title">Nome do Anime</h2>
+        </div>
+        
+        <div class="season-selector">
+            <select id="season-dropdown" class="season-select" onchange="renderEpisodes()">
+                </select>
+        </div>
+
+        <div class="ep-grid" id="ep-list"></div>
+    </div>
+
+    <div class="modal-bg" id="settings-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleModal()">&times;</span>
+            <h3 style="margin-top:0; color:var(--accent);">Adicionar Anime (Modo Pasta)</h3>
+
+            <div class="config-section">
+                <p style="font-size:0.8rem; color:#aaa;">Isso cria uma pasta para o anime e organiza os episódios dentro da temporada escolhida.</p>
+                
+                <label>1. Nome do Anime (A Pasta)</label>
+                <input type="text" id="form-anime" placeholder="Ex: Naruto Shippuden">
+
+                <label>2. Capa do Anime (Poster Vertical)</label>
+                <input type="text" id="form-cover" placeholder="Link da imagem">
+
+                <label>3. Nome da Temporada</label>
+                <input type="text" id="form-season" placeholder="Ex: Temporada 1">
+
+                <label>4. Lista de Episódios (Nome | Link)</label>
+                <textarea id="form-list" rows="5" placeholder="Episódio 1 | https://video.mp4&#10;Episódio 2 | https://video.mp4"></textarea>
+
+                <button class="btn-full" onclick="addAnimeFolder()">Criar Pasta / Adicionar Eps</button>
+            </div>
+
+            <div class="config-section" style="border: 1px solid var(--accent);">
+                <label>🚀 Atualizar Site (GitHub)</label>
+                <button class="btn-full btn-primary" onclick="generateCode()">GERAR CÓDIGO COMPLETO</button>
+                <textarea id="code-output" rows="5" placeholder="O código aparecerá aqui..." style="display:none; margin-top:10px;" onclick="this.select()"></textarea>
+            </div>
+            
+            <div class="config-section">
+                <button class="btn-full" onclick="clearData()" style="background:#333;">Limpar Tudo (Reset)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="player-overlay">
+        <div class="player-top">
+            <span id="player-title" style="color:white; font-weight:bold;">Assistindo...</span>
+            <span style="color:white; font-size:1.5rem; cursor:pointer;" onclick="closePlayer()">&times;</span>
+        </div>
+        <div id="video-area"></div>
+    </div>
+
+    <script>
+        // ========================================================
+        // BANCO DE DADOS EM FORMATO DE PASTAS (SÉRIES)
+        // ========================================================
+        /* Estrutura: 
+           Nome do Anime -> { capa: "url", temporadas: { "Temp 1": [eps], "Temp 2": [eps] } } 
+        */
+        const db_series = {
+            "Exemplo Naruto": {
+                "cover": "https://via.placeholder.com/200x300/333/fff?text=Naruto",
+                "seasons": {
+                    "Temporada 1": [
+                        { "nome": "Episódio 01", "link": "https://www.w3schools.com/html/mov_bbb.mp4" },
+                        { "nome": "Episódio 02", "link": "https://www.w3schools.com/html/mov_bbb.mp4" }
+                    ],
+                    "Temporada 2": [
+                        { "nome": "Episódio 50", "link": "https://www.w3schools.com/html/mov_bbb.mp4" }
+                    ]
+                }
+            }
+        };
+
+        const LOCAL_KEY = 'anime_db_v9';
+        const SAVE_KEY = 'anime_history_v9';
+        let currentAnime = null; // Qual anime está aberto
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCatalog();
+            updateHistoryUI();
+        });
+
+        // --- SISTEMA DE DADOS (GLOBAL + LOCAL) ---
+        function getFullDB() {
+            let local = JSON.parse(localStorage.getItem(LOCAL_KEY)) || {};
+            // Mesclar o banco local com o global
+            let combined = JSON.parse(JSON.stringify(db_series));
+
+            for (let animeName in local) {
+                if (!combined[animeName]) {
+                    // Se o anime não existe no global, cria
+                    combined[animeName] = local[animeName];
+                } else {
+                    // Se existe, mescla as temporadas
+                    for (let seasonName in local[animeName].seasons) {
+                        combined[animeName].seasons[seasonName] = local[animeName].seasons[seasonName];
+                    }
+                }
+            }
+            return combined;
+        }
+
+        // --- ADICIONAR (MODO PASTA) ---
+        function addAnimeFolder() {
+            let anime = document.getElementById('form-anime').value.trim();
+            let cover = document.getElementById('form-cover').value.trim();
+            let season = document.getElementById('form-season').value.trim();
+            let list = document.getElementById('form-list').value;
+
+            if(!anime || !season || !list) { alert("Preencha Anime, Temporada e Lista!"); return; }
+            if(!cover) cover = "https://via.placeholder.com/200x300/111/fff?text=" + encodeURIComponent(anime);
+
+            let localDB = JSON.parse(localStorage.getItem(LOCAL_KEY)) || {};
+
+            // Cria a estrutura do anime se não existir
+            if (!localDB[anime]) {
+                localDB[anime] = { "cover": cover, "seasons": {} };
+            }
+            // Cria a temporada se não existir
+            if (!localDB[anime].seasons[season]) {
+                localDB[anime].seasons[season] = [];
+            }
+
+            // Processa a lista de episódios
+            let count = 0;
+            list.split('\n').forEach(line => {
+                if (line.includes('|')) {
+                    let parts = line.split('|');
+                    localDB[anime].seasons[season].push({
+                        "nome": parts[0].trim(),
+                        "link": parts[1].trim()
+                    });
+                    count++;
+                }
+            });
+
+            localStorage.setItem(LOCAL_KEY, JSON.stringify(localDB));
+            alert(`Adicionado ${count} episódios em "${anime} > ${season}"`);
+            
+            // Limpa campos
+            document.getElementById('form-list').value = "";
+            renderCatalog();
+        }
+
+        // --- RENDERIZAR CATÁLOGO (HOME) ---
+        function renderCatalog() {
+            const grid = document.getElementById('anime-catalog');
+            grid.innerHTML = "";
+            let db = getFullDB();
+
+            Object.keys(db).sort().forEach(animeName => {
+                let anime = db[animeName];
+                let div = document.createElement('div');
+                div.className = 'anime-folder';
+                div.onclick = () => openSeries(animeName);
+                
+                div.innerHTML = `
+                    <img class="folder-poster" src="${anime.cover}">
+                    <div class="folder-title">${animeName}</div>
+                    <div class="folder-meta">${Object.keys(anime.seasons).length} Temporadas</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // --- ABRIR UMA PASTA (SÉRIE) ---
+        function openSeries(animeName) {
+            currentAnime = animeName;
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('series-view').style.display = 'block';
+            document.getElementById('series-title').innerText = animeName;
+
+            let db = getFullDB();
+            let anime = db[animeName];
+            let select = document.getElementById('season-dropdown');
+            
+            // Preenche o Dropdown de Temporadas
+            select.innerHTML = "";
+            Object.keys(anime.seasons).forEach(seasonName => {
+                let opt = document.createElement('option');
+                opt.value = seasonName;
+                opt.innerText = seasonName;
+                select.appendChild(opt);
+            });
+
+            // Mostra episódios da primeira temporada disponível
+            renderEpisodes();
+        }
+
+        function renderEpisodes() {
+            if (!currentAnime) return;
+            let db = getFullDB();
+            let seasonName = document.getElementById('season-dropdown').value;
+            let episodes = db[currentAnime].seasons[seasonName] || [];
+            let grid = document.getElementById('ep-list');
+            grid.innerHTML = "";
+
+            episodes.forEach(ep => {
+                let div = document.createElement('div');
+                div.className = 'ep-card';
+                div.onclick = () => openPlayer(ep.link, ep.nome, db[currentAnime].cover);
+                
+                // Tenta pegar a capa do anime para usar no thumb se não tiver img específica
+                let thumb = db[currentAnime].cover;
+
+                div.innerHTML = `
+                    <div class="ep-name">${ep.nome}</div>
+                    <div class="ep-link-indicator"><i class="fas fa-play"></i> Assistir</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function goHome() {
+            document.getElementById('series-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'block';
+            currentAnime = null;
+        }
+
+        // --- PLAYER & HISTÓRICO ---
+        function openPlayer(url, name, cover) {
+            const ov = document.getElementById('player-overlay');
+            const ar = document.getElementById('video-area');
+            document.getElementById('player-title').innerText = name;
+            ov.style.display = 'flex'; ar.innerHTML = "";
+            
+            if(url.includes('drive.google.com')) url = url.replace('/view','/preview').replace('/sharing','/preview');
+            
+            if(url.includes('.mp4')) ar.innerHTML = `<video controls autoplay><source src="${url}" type="video/mp4"></video>`;
+            else if(url.includes('.m3u8')) {
+                let v = document.createElement('video'); v.controls=true; v.autoplay=true; ar.appendChild(v);
+                if(Hls.isSupported()) { let h = new Hls(); h.loadSource(url); h.attachMedia(v); }
+                else if(v.canPlayType('application/vnd.apple.mpegurl')) v.src = url;
+            } else ar.innerHTML = `<iframe src="${url}" allow="autoplay" allowfullscreen></iframe>`;
+            
+            saveHistory(name, url, cover);
+        }
+
+        function closePlayer() { 
+            document.getElementById('player-overlay').style.display = 'none'; 
+            document.getElementById('video-area').innerHTML = ""; 
+            updateHistoryUI(); 
+        }
+
+        function saveHistory(n, l, c) {
+            let h = JSON.parse(localStorage.getItem(SAVE_KEY)) || [];
+            h = h.filter(i => i.link !== l);
+            h.unshift({name:n, link:l, cover:c, percent: Math.floor(Math.random()*90)+10});
+            localStorage.setItem(SAVE_KEY, JSON.stringify(h));
+        }
+
+        function updateHistoryUI() {
+            let h = JSON.parse(localStorage.getItem(SAVE_KEY)) || [];
+            const c = document.getElementById('cw-list');
+            const s = document.getElementById('continue-section');
+            if(h.length===0) { s.style.display='none'; return; }
+            s.style.display='block'; c.innerHTML="";
+            
+            h.forEach(i => {
+                let d = document.createElement('div'); d.className='cw-card';
+                d.onclick = () => openPlayer(i.link, i.name, i.cover);
+                d.innerHTML = `
+                    <div class="cw-thumb-box">
+                        <img src="${i.cover}" alt="${i.name}">
+                        <div class="cw-info"><div class="cw-name">${i.name}</div></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:${i.percent}%"></div></div>
+                    </div>`;
+                c.appendChild(d);
+            });
+        }
+
+        // --- SISTEMA DE GERAÇÃO DE CÓDIGO ---
+        function generateCode() {
+            let fullDB = getFullDB();
+            let jsonString = JSON.stringify(fullDB, null, 4);
+            let htmlContent = document.documentElement.outerHTML;
+            htmlContent = "<!DOCTYPE html>\n" + htmlContent;
+            
+            let newScript = `const db_series = ${jsonString};`;
+            // Substitui a variável db_series
+            let updatedHTML = htmlContent.replace(/const db_series = \{[\s\S]*?\};/, newScript);
+
+            let area = document.getElementById('code-output');
+            area.style.display = 'block';
+            area.value = updatedHTML;
+            area.select();
+            alert("Código Gerado! Isso salvará suas pastas e episódios.");
+        }
+
+        function toggleModal() { let m = document.getElementById('settings-modal'); m.style.display = (m.style.display==='flex')?'none':'flex'; }
+        function clearData() { if(confirm("Apagar dados locais?")) { localStorage.removeItem(LOCAL_KEY); location.reload(); } }
+
+    </script>
+</body>
+</html>
