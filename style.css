@@ -1,0 +1,73 @@
+body {
+  background: #111;
+  color: white;
+  font-family: Arial;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #222;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+input {
+  display: block;
+  width: 90%;
+  margin: 8px auto;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  border: none;
+  background: #e50914;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 15px;
+}
+
+.card {
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.card button {
+  margin-top: 5px;
+  width: 100%;
+}
+
+/* Modo claro */
+body.light {
+  background: #f0f0f0;
+  color: black;
+}
+
+body.light header {
+  background: #ddd;
+}
+
+body.light .card {
+  background: #fff;
+}
